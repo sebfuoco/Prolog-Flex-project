@@ -1,0 +1,61 @@
+question risk
+	'Risk: Low, Medium, or High';
+	choose one of low, medium, high.
+
+question condition
+	'Condition length: Days, Weeks, or Months';
+	choose one of days, weeks, months.
+
+question lifestyle
+	'Lifestyle: Sedentary or Active';
+	choose one of sedentary, active.
+
+question anaemia
+	'Anaemia: Present or Absent';
+	choose one of present, absent.
+
+question bloodpressure
+	'Blood Pressure: Raised or Normal';
+	choose one of raised, normal.
+
+rule trial_unjustifiable
+	if the risk is high then the trial becomes unjustifiable.
+
+rule trial_justifiable
+	if the risk is medium or low then the trial becomes justifiable.
+
+rule low_antibody
+	if the condition is days then the antibody becomes low.
+
+rule medium_antibody
+	if the condition is weeks then the antibody becomes medium.
+
+rule high_antibody 
+	if the condition is months then the antibody becomes high.
+
+rule outpatient
+	if the antibody is low or the anaemia is absent and the lifestyle is active 
+	then the patient becomes outpatient and echo('Outpatient').
+
+rule inpatient
+	if the antibody is medium and the lifestyle is sedentary and the trial is 
+	justifiable and the anaemia is present and the bloodpressure is 
+	raised then the patient becomes inpatient and echo('Inpatient').
+
+rule daypatient
+	if the antibody is high or the trial is unjustifiable then the patient 
+	becomes daypatient and echo('Daypatient').
+
+rule waiting_list
+	if the patient is not included in {outpatient, inpatient, daypatient} 
+	then the patient becomes waiting_list and echo('Waiting List').
+
+ruleset checking_rules
+	contains all rules;
+	update ruleset by removing each selected rule.
+
+action questions;
+	do ask risk and ask condition and ask lifestyle and ask anaemia and ask bloodpressure
+	and invoke ruleset checking_rules and write(lifestyle + '') and 
+	write(anaemia + '') and write(bloodpressure + '') and write(antibody + '')
+	and nl.

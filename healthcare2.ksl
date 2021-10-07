@@ -1,0 +1,72 @@
+% Questions
+question risk
+	'Risk: Low, Medium, or High';
+	choose one of low, medium, high.
+
+question condition
+	'Condition length: Days, Weeks, or Months';
+	choose one of days, weeks, months.
+
+question lifestyle
+	'Lifestyle: Sedentary or Active';
+	choose one of sedentary, active.
+
+question anaemia
+	'Anaemia: Present or Absent';
+	choose one of present, absent.
+
+question bloodpressure
+	'Blood Pressure: Raised or Normal';
+	choose one of raised, normal.
+
+% Relations
+relation check_patient(Patient) % Check suggest_patients
+	if one(suggest_patient(SuggestedPatient))
+	and Patient = SuggestedPatient.
+
+% outpatient and daypatient conditions split up to reduce questions asked
+relation suggest_patient(outpatient)
+	if check_antibody(low).
+
+relation suggest_patient(daypatient)
+	if check_antibody(high).
+
+relation suggest_patient(outpatient)
+	if anaemia is absent and the lifestyle is active.
+
+relation suggest_patient(inpatient)
+	if check_antibody(medium) and the lifestyle is sedentary and check_trial(justifiable)
+	and the anaemia is present and the bloodpressure is raised.
+
+relation suggest_patient(daypatient)
+	if check_trial(unjustifiable).
+
+relation suggest_patient(waitinglist) % no conditions required, as relations above fail and this relation is always true
+	if true.
+
+relation check_trial(Trial) % Check suggest_trial
+	if one(suggest_trial(SuggestedTrial))
+	and Trial = SuggestedTrial.
+
+relation suggest_trial(justifiable)
+	if the risk is included in {low, medium}.
+
+relation suggest_trial(unjustifiable)
+	if the risk is high.
+
+relation check_antibody(Antibody) % Check suggest_antibody
+	if one(suggest_antibody(SuggestedAntibody))
+	and Antibody = SuggestedAntibody.
+
+relation suggest_antibody(low)
+	if the condition is days.
+
+relation suggest_antibody(medium)
+	if the condition is weeks.
+
+relation suggest_antibody(high)
+	if the condition is months.
+
+% Action
+action health;
+	 do restart and check_patient(Patient) and write(Patient) and nl.
